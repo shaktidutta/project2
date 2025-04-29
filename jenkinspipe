@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Define variables
+EC2_USER=ec2-user
+EC2_HOST=your-ec2-public-ip
+SSH_KEY=/path/to/your/private-key.pem
+IMAGE_NAME=hshar/webapp
+CONTAINER_NAME=myapp
+PORT=80
+
+# SSH into EC2 and deploy
+ssh -o StrictHostKeyChecking=no -i $SSH_KEY $EC2_USER@$EC2_HOST << EOF
+  echo "Stopping and removing old container..."
+  docker stop $CONTAINER_NAME || true
+  docker rm $CONTAINER_NAME || true
+
+  echo "Pulling new image..."
+  docker pull $IMAGE_NAME
+
+  echo "Running container..."
+  docker run -d --name $CONTAINER_NAME -p $PORT:80 $IMAGE_NAME
+EOF
+
